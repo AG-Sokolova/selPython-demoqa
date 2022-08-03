@@ -2,7 +2,7 @@ import time
 from random import randint
 from selenium.webdriver.common.by import By
 from generator.generator import generated_person
-from locators.elements_page_locators import TextBoxPageLocators, CheckBoxLocators, RadioButtonLocators
+from locators.elements_page_locators import TextBoxPageLocators, CheckBoxLocators, RadioButtonLocators, WebTablesLocators
 from pages.base_page import BasePage
 
 
@@ -12,7 +12,7 @@ class TextBoxPage(BasePage):
     def fill_all_fields(self):
         person_info = next(generated_person())
 
-        full_name = person_info.full_name
+        full_name = f'{person_info.first_name} {person_info.first_name} {person_info.middle_name}'
         email = person_info.email
         current_address = person_info.current_address
         permanent_address = person_info.permanent_address
@@ -79,3 +79,42 @@ class RadioButtonPage(BasePage):
 
     def get_output_result(self):
         return self.element_is_present(self.locators.OUTPUT_RESULT).text.lower()
+
+class WebTablesPage(BasePage):
+    locators = WebTablesLocators()
+
+    def add_new_person(self, count=1):
+        data = []
+        for i in range(count):
+            person_info = next(generated_person())
+
+            firstname = person_info.first_name
+            lastname = person_info.last_name
+            email = person_info.email
+            age = str(person_info.age)
+            salary = str(person_info.salary)
+            dapartment = person_info.department
+            data.append([firstname, lastname, age, email, salary, dapartment])
+
+            self.element_is_visible(self.locators.ADD_BUTTON).click()
+            self.element_is_visible(self.locators.FIRSTNAME_INPUT).send_keys(firstname)
+            self.element_is_visible(self.locators.LASTNAME_INPUT).send_keys(lastname)
+            self.element_is_visible(self.locators.EMAIL_INPUT).send_keys(email)
+            self.element_is_visible(self.locators.AGE_INPUT).send_keys(age)
+            self.element_is_visible(self.locators.SALARY_INPUT).send_keys(salary)
+            self.element_is_visible(self.locators.DEPARTMENT_INPUT).send_keys(dapartment)
+            self.element_is_visible(self.locators.SUBMIT).click()
+            time.sleep(3)
+        return data
+
+    def check_person(self):
+        data = []
+        person_list = self.elements_are_present(self.locators.FULL_PEOPLE_LIST)
+
+        for item in person_list:
+            if len(item.text.replace(' ', '')) != 0:
+                data.append(item.text.splitlines())
+        return data
+
+    def search_some_person(self, word):
+        self.element_is_visible(self.locators.SEARCH_INPUT).send_keys(word)
