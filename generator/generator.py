@@ -13,7 +13,7 @@ def generated_person():
         email=fake_ru.email(),
         current_address=fake_ru.address(),
         permanent_address=fake_ru.address(),
-        age=randint(18, 60),
-        salary=randint(10000, 60000),
+        age=str(randint(18, 60)),
+        salary=str(randint(10000, 60000)),
         department=fake_ru.job(),
     )

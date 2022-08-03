@@ -1,3 +1,4 @@
+import random
 import time
 from random import randint
 from selenium.webdriver.common.by import By
@@ -83,7 +84,7 @@ class RadioButtonPage(BasePage):
 class WebTablesPage(BasePage):
     locators = WebTablesLocators()
 
-    def add_new_person(self, count=1):
+    def add_person(self, count=1):
         data = []
         for i in range(count):
             person_info = next(generated_person())
@@ -91,8 +92,8 @@ class WebTablesPage(BasePage):
             firstname = person_info.first_name
             lastname = person_info.last_name
             email = person_info.email
-            age = str(person_info.age)
-            salary = str(person_info.salary)
+            age = person_info.age
+            salary = person_info.salary
             dapartment = person_info.department
             data.append([firstname, lastname, age, email, salary, dapartment])
 
@@ -104,7 +105,6 @@ class WebTablesPage(BasePage):
             self.element_is_visible(self.locators.SALARY_INPUT).send_keys(salary)
             self.element_is_visible(self.locators.DEPARTMENT_INPUT).send_keys(dapartment)
             self.element_is_visible(self.locators.SUBMIT).click()
-            time.sleep(3)
         return data
 
     def check_person(self):
@@ -114,7 +114,60 @@ class WebTablesPage(BasePage):
         for item in person_list:
             if len(item.text.replace(' ', '')) != 0:
                 data.append(item.text.splitlines())
-        return data
+        return 'No rows found' if len(data) == 0 else data
 
     def search_some_person(self, word):
         self.element_is_visible(self.locators.SEARCH_INPUT).send_keys(word)
+
+    def get_field_edit_form(self):
+        return {'firstname':  self.element_is_visible(self.locators.FIRSTNAME_INPUT).get_attribute('value'),
+                'lastname': self.element_is_visible(self.locators.LASTNAME_INPUT).get_attribute('value'),
+                'age': self.element_is_visible(self.locators.AGE_INPUT).get_attribute('value'),
+                'email': self.element_is_visible(self.locators.EMAIL_INPUT).get_attribute('value'),
+                'salary': self.element_is_visible(self.locators.SALARY_INPUT).get_attribute('value'),
+                'dapartment': self.element_is_visible(self.locators.DEPARTMENT_INPUT).get_attribute('value')
+                }
+
+    def edit_person(self):
+        person_info = next(generated_person())
+        random_field = random.choice(['firstname', 'lastname', 'age', 'email', 'salary', 'dapartment'])
+
+        self.element_is_visible(self.locators.UPDATE_BUTTON).click()
+        edit_person_info = self.get_field_edit_form()
+        match random_field:
+            case 'firstname':
+                firstname = person_info.first_name
+                self.element_is_visible(self.locators.FIRSTNAME_INPUT).clear()
+                self.element_is_visible(self.locators.FIRSTNAME_INPUT).send_keys(firstname)
+                edit_person_info['firstname'] = firstname
+            case 'lastname':
+                lastname = person_info.last_name
+                self.element_is_visible(self.locators.LASTNAME_INPUT).clear()
+                self.element_is_visible(self.locators.LASTNAME_INPUT).send_keys(lastname)
+                edit_person_info['lastname'] = lastname
+            case 'age':
+                age = person_info.age
+                self.element_is_visible(self.locators.AGE_INPUT).clear()
+                self.element_is_visible(self.locators.AGE_INPUT).send_keys(age)
+                edit_person_info['age'] = age
+            case 'email':
+                email = person_info.email
+                self.element_is_visible(self.locators.EMAIL_INPUT).clear()
+                self.element_is_visible(self.locators.EMAIL_INPUT).send_keys(email)
+                edit_person_info['email'] = email
+            case 'salary':
+                salary = person_info.salary
+                self.element_is_visible(self.locators.SALARY_INPUT).clear()
+                self.element_is_visible(self.locators.SALARY_INPUT).send_keys(salary)
+                edit_person_info['salary'] = salary
+            case 'dapartment':
+                dapartment = person_info.department
+                self.element_is_visible(self.locators.DEPARTMENT_INPUT).clear()
+                self.element_is_visible(self.locators.DEPARTMENT_INPUT).send_keys(dapartment)
+                edit_person_info['dapartment'] = dapartment
+        self.element_is_visible(self.locators.SUBMIT).click()
+        return list(edit_person_info.values())
+
+    def delete_person(self):
+        self.element_is_visible(self.locators.DELETE_BUTTON)
+
