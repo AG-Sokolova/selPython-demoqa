@@ -49,7 +49,7 @@ class TestElements:
             web_table_page = WebTablesPage(driver, 'https://demoqa.com/webtables')
             web_table_page.open()
 
-            input = web_table_page.add_new_person(5)
+            input = web_table_page.add_person(5)
             output = web_table_page.check_person()
 
             for items in input:
@@ -59,11 +59,50 @@ class TestElements:
             web_table_page = WebTablesPage(driver, 'https://demoqa.com/webtables')
             web_table_page.open()
 
-            new_person = web_table_page.add_new_person()[0]
+            # создаем нового пользователя
+            new_person = web_table_page.add_person()[0]
+            # поиск пользователя
             key_word = new_person[random.randint(0, 5)]
             web_table_page.search_some_person(key_word)
+            # получаем данные из таблицы
             table_result = web_table_page.check_person()
+            # сравниваем, полностью строку, отображается ли новая строка при поиске
             assert new_person in table_result, f'the person {new_person} was not found in the table'
-
+            # сравниваем, все ли строки содержат слово, которое указано в поиске
             for person in table_result:
                 assert key_word in person, f'{key_word} have not been selected'
+
+        def test_web_table_edit_person(self, driver):
+            web_table_page = WebTablesPage(driver, 'https://demoqa.com/webtables')
+            web_table_page.open()
+
+            # рандомный пользователь из таблицы
+            # random_person = random.choice(web_table_page.check_person())
+            # web_table_page.search_some_person(random_person[1])
+
+            # создаем нового пользователя и ищем его по email через поиск
+            # new_person = web_table_page.add_person()[0]
+            # key_word = new_person[4]  # => получить email созданного пользователя
+
+            web_table_page.search_some_person('Cierra')
+            edit_person = web_table_page.edit_person()
+            table_result = web_table_page.check_person()
+            assert edit_person in table_result, f'the person card has not been change'
+
+        def test_web_table_delete_person(self, driver):
+            web_table_page = WebTablesPage(driver, 'https://demoqa.com/webtables')
+            web_table_page.open()
+
+            # создать нового пользователя
+            new_person = web_table_page.add_person()[0]
+            # поиск пользователя по email
+            key_word = new_person[4]  # => получить email созданного пользователя
+            web_table_page.search_some_person(new_person[4])
+            # удалить пользователя
+            web_table_page.delete_person()
+            # проверить что пользователь удален, при поиске появится надпись 'No rows found' если пользователь удален
+            web_table_page.search_some_person(key_word)
+            table_result = web_table_page.check_person()
+            assert table_result == 'No rows found', f'Not delete {new_person}'
+
+
