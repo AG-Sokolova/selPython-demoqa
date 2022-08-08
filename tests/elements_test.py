@@ -1,4 +1,4 @@
-from pages.elements_page import TextBoxPage, CheckBoxPage, RadioButtonPage, WebTablesPage
+from pages.elements_page import TextBoxPage, CheckBoxPage, RadioButtonPage, WebTablesPage,ButtonsPage
 import random
 import time
 
@@ -105,4 +105,16 @@ class TestElements:
             table_result = web_table_page.check_person()
             assert table_result == 'No rows found', f'Not delete {new_person}'
 
+    class TestButtons:
 
+        def test_different_click_on_the_buttons(self, driver):
+            buttons_page = ButtonsPage(driver, 'https://demoqa.com/buttons')
+            buttons_page.open()
+
+            dict_buttons = {
+                'double': 'You have done a double click',
+                'right': 'You have done a right click',
+                'click': 'You have done a dynamic click'
+            }
+            for key, value in dict_buttons.items():
+                assert buttons_page.click_on_different(key) == value, f'The {key} button was not pressed'
