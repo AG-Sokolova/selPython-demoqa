@@ -3,7 +3,8 @@ import time
 from random import randint
 from selenium.webdriver.common.by import By
 from generator.generator import generated_person
-from locators.elements_page_locators import TextBoxPageLocators, CheckBoxLocators, RadioButtonLocators, WebTablesLocators
+from locators.elements_page_locators import TextBoxPageLocators, CheckBoxLocators, RadioButtonLocators, \
+    WebTablesLocators, ButtonsLocators
 from pages.base_page import BasePage
 
 
@@ -170,4 +171,22 @@ class WebTablesPage(BasePage):
 
     def delete_person(self):
         self.element_is_visible(self.locators.DELETE_BUTTON)
+
+class ButtonsPage(BasePage):
+    locators = ButtonsLocators()
+
+    def click_on_different(self, type_click):
+        match type_click:
+            case 'double':
+                self.action_double_click(self.element_is_visible(self.locators.DOUBLE_BUTTON))
+                return self.check_clicked(self.locators.SUCCESS_DOUBLE)
+            case 'right':
+                self.action_right_click(self.element_is_visible(self.locators.RIGHT_BUTTON))
+                return self.check_clicked(self.locators.SUCCESS_RIGHT)
+            case 'click':
+                self.element_is_visible(self.locators.CLICK_ME_BUTTON).click()
+                return self.check_clicked(self.locators.SUCCESS_CLICK_ME)
+
+    def check_clicked(self, element):
+        return self.element_is_present(element).text
 
